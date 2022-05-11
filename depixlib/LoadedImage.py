@@ -30,7 +30,7 @@ class LoadedImage():
 		if self.loadedImage == False:
 			self.loadImage()
 
-		self.imageData = [[y for y in range(self.height)] for x in range(self.width)]
+		self.imageData = [list(range(self.height)) for _ in range(self.width)]
 
 		rawData = self.loadedImage.getdata()
 		rawDataCount = 0
@@ -39,5 +39,5 @@ class LoadedImage():
 		for y in range(self.height):
 			for x in range(self.width):
 
-				self.imageData[x][y] = rawData[rawDataCount][0:3]
+				self.imageData[x][y] = rawData[rawDataCount][:3]
 				rawDataCount += 1

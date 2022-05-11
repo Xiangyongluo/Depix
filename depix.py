@@ -24,18 +24,18 @@ args = parser.parse_args()
 
 pixelatedImagePath = args.pixelimage
 searchImagePath = args.searchimage
-if args.backgroundcolor != None:
-	editorBackgroundColor = tuple([int(x) for x in args.backgroundcolor.split(",")])
-else:
+if args.backgroundcolor is None:
 	editorBackgroundColor = args.backgroundcolor
+else:
+	editorBackgroundColor = tuple(int(x) for x in args.backgroundcolor.split(","))
 averageType = args.averagetype
 
 
-logging.info("Loading pixelated image from %s" % pixelatedImagePath)
+logging.info(f"Loading pixelated image from {pixelatedImagePath}")
 pixelatedImage = LoadedImage(pixelatedImagePath)
 unpixelatedOutputImage = pixelatedImage.getCopyOfLoadedPILImage()
 
-logging.info("Loading search image from %s" % searchImagePath)
+logging.info(f"Loading search image from {searchImagePath}")
 searchImage = LoadedImage(searchImagePath)
 
 
@@ -45,13 +45,13 @@ pixelatedRectange = Rectangle((0, 0), (pixelatedImage.width-1, pixelatedImage.he
 
 
 pixelatedSubRectanges = findSameColorSubRectangles(pixelatedImage, pixelatedRectange)
-logging.info("Found %s same color rectangles" % len(pixelatedSubRectanges))
+logging.info(f"Found {len(pixelatedSubRectanges)} same color rectangles")
 
 pixelatedSubRectanges = removeMootColorRectangles(pixelatedSubRectanges, editorBackgroundColor)
-logging.info("%s rectangles left after moot filter" % len(pixelatedSubRectanges))
+logging.info(f"{len(pixelatedSubRectanges)} rectangles left after moot filter")
 
 rectangeSizeOccurences = findRectangleSizeOccurences(pixelatedSubRectanges)
-logging.info("Found %s different rectangle sizes" % len(rectangeSizeOccurences))
+logging.info(f"Found {len(rectangeSizeOccurences)} different rectangle sizes")
 if len(rectangeSizeOccurences) > max(10, pixelatedRectange.width * pixelatedRectange.height * 0.01):
 	logging.warning("Too many variants on block size. Re-pixelating the image might help.")
 
@@ -65,17 +65,23 @@ pixelatedSubRectanges = dropEmptyRectangleMatches(rectangleMatches, pixelatedSub
 logging.info("Splitting single matches and multiple matches")
 singleResults, pixelatedSubRectanges = splitSingleMatchAndMultipleMatches(pixelatedSubRectanges, rectangleMatches)
 
-logging.info("[%s straight matches | %s multiple matches]" % (len(singleResults), len(pixelatedSubRectanges)))
+logging.info(
+    f"[{len(singleResults)} straight matches | {len(pixelatedSubRectanges)} multiple matches]"
+)
 
 logging.info("Trying geometrical matches on single-match squares")
 singleResults, pixelatedSubRectanges = findGeometricMatchesForSingleResults(singleResults, pixelatedSubRectanges, rectangleMatches)
 
-logging.info("[%s straight matches | %s multiple matches]" % (len(singleResults), len(pixelatedSubRectanges)))
+logging.info(
+    f"[{len(singleResults)} straight matches | {len(pixelatedSubRectanges)} multiple matches]"
+)
 
 logging.info("Trying another pass on geometrical matches")
 singleResults, pixelatedSubRectanges = findGeometricMatchesForSingleResults(singleResults, pixelatedSubRectanges, rectangleMatches)
 
-logging.info("[%s straight matches | %s multiple matches]" % (len(singleResults), len(pixelatedSubRectanges)))
+logging.info(
+    f"[{len(singleResults)} straight matches | {len(pixelatedSubRectanges)} multiple matches]"
+)
 
 
 logging.info("Writing single match results to output")
@@ -86,5 +92,5 @@ writeAverageMatchToImage(pixelatedSubRectanges, rectangleMatches, searchImage, u
 
 # writeRandomMatchesToImage(pixelatedSubRectanges, rectangleMatches, searchImage, unpixelatedOutputImage)
 
-logging.info("Saving output image to: %s" % args.outputimage)
+logging.info(f"Saving output image to: {args.outputimage}")
 unpixelatedOutputImage.save(args.outputimage)

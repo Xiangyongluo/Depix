@@ -19,7 +19,7 @@ image = LoadedImage(imagePath)
 outputImage = image.getCopyOfLoadedPILImage()
 
 blockSize = 5
-blockPixelCount = blockSize * blockSize
+blockPixelCount = blockSize**2
 
 for x in range(0, image.width, blockSize):
 	for y in range(0, image.height, blockSize):
